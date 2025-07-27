@@ -7,7 +7,8 @@ model:
   arch: gpt4point_opt
   model_type: gpt4point_opt2.7b
   use_grad_checkpoint: False
-  load_finetuned: True
+  load_finetuned: False
+  pretrained: "/home/yanai-lab/kanayama-r/Projects/LLM/GPT4Point-Food/weights/gpt4point_pretrain_stage2_opt2.7b.pth"
   ckpt_special_strs: []
 
 datasets:
@@ -15,7 +16,10 @@ datasets:
     text_processor:
       eval:
         name: "blip_caption"
-        prompt: "a 3D point cloud of "
+        # prompt: "a 3D point cloud of "
+        # prompt: "This is a 3D point cloud of food. What kind of food?"
+        # prompt: "a 3D food point cloud of"
+        prompt: "The following input is a 3-D point-cloud model of a food object. Answer with **exactly one** word chosen from this list: friedshrimp, potato, tamago Do not add any extra words, punctuation or explanations. Answer:"
     pts_processor:
       eval:
         name: "gpt4point_cap3d_eval"
@@ -27,8 +31,8 @@ run:
   batch_size_eval: 16
   num_workers: 4
 
-  max_len: 30
-  min_len: 8
+  max_len: 250
+  min_len: 50
   num_beams: 5
 
   seed: 42
@@ -40,4 +44,4 @@ run:
   device: "cuda"
   world_size: 1
   dist_url: "env://"
-  distributed: True
+  distributed: True #一旦

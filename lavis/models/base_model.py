@@ -102,7 +102,7 @@ class BaseModel(nn.Module):
             if load_pretrained:
                 # load pre-trained weights
                 pretrain_path = cfg.get("pretrained", None)
-                assert "Found load_finetuned is False, but pretrain_path is None."
+                assert pretrain_path is not None, "Found load_finetuned is False, but pretrain_path is None."
                 self.load_from_pretrained(url_or_filename=pretrain_path, **kwargs)
 
     def get_optimizer_params(self, weight_decay, lr_scale=1):
@@ -148,6 +148,19 @@ class BaseModel(nn.Module):
         """
         filtered_ckpt = {}
         special_modules =[]
+
+        for key in self.state_dict().keys():
+            shape_model = self.state_dict()[key].shape
+            if key in ckpt_state_dict:
+                shape_ckpt = ckpt_state_dict[key].shape
+                if shape_model != shape_ckpt:
+                    print(f"Shape mismatch for {key}: model={shape_model}, ckpt={shape_ckpt}")
+            else:
+                print(f"Key missing in ckpt: {key}")
+
+        # import pdb
+        # pdb.set_trace()
+        
         for key in self.state_dict().keys():
             if key in ckpt_state_dict and not any(special_str in key for special_str in special_strs):
                 filtered_ckpt[key] = ckpt_state_dict[key]

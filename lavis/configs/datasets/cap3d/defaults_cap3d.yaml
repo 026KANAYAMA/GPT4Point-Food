@@ -19,7 +19,8 @@ datasets:
           storage: cap3d/annotations/cap3d_caption_val.json
         test:
           url: hugging_face
-          storage: cap3d/annotations/val_and_test/cap3d_real_and_chatgpt_caption_test.json
+          # storage: cap3d/annotations/val_and_test/cap3d_real_and_chatgpt_caption_test.json
+          storage: cap3d/annotations/val_and_test/cap3d_caption_test.json
       points:
         storage: cap3d/points/Cap3D_pcs_8192_xyz_w_color/
 

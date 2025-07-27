@@ -101,54 +101,57 @@ class BaseDatasetBuilder:
 
         Local annotation paths should be relative.
         """
-        anns = self.config.build_info.annotations
+        # 全てコメントアウト
+        # anns = self.config.build_info.annotations
+        # import pdb
+        # pdb.set_trace()
 
-        splits = anns.keys()
+        # splits = anns.keys()
 
-        cache_root = registry.get_path("cache_root")
+        # cache_root = registry.get_path("cache_root")
 
-        for split in splits:
-            info = anns[split]
+        # for split in splits:
+        #     info = anns[split]
 
-            urls, storage_paths = info.get("url", None), info.storage
+        #     urls, storage_paths = info.get("url", None), info.storage
 
-            if isinstance(urls, str):
-                urls = [urls]
-            if isinstance(storage_paths, str):
-                storage_paths = [storage_paths]
+        #     if isinstance(urls, str):
+        #         urls = [urls]
+        #     if isinstance(storage_paths, str):
+        #         storage_paths = [storage_paths]
 
-            assert len(urls) == len(storage_paths)
+        #     assert len(urls) == len(storage_paths)
 
-            for url_or_filename, storage_path in zip(urls, storage_paths):
-                # if storage_path is relative, make it full by prefixing with cache_root.
-                if not os.path.isabs(storage_path):
-                    storage_path = os.path.join(cache_root, storage_path)
+        #     for url_or_filename, storage_path in zip(urls, storage_paths):
+        #         # if storage_path is relative, make it full by prefixing with cache_root.
+        #         if not os.path.isabs(storage_path):
+        #             storage_path = os.path.join(cache_root, storage_path)
 
-                dirname = os.path.dirname(storage_path)
-                if not os.path.exists(dirname):
-                    os.makedirs(dirname)
+        #         dirname = os.path.dirname(storage_path)
+        #         if not os.path.exists(dirname):
+        #             os.makedirs(dirname)
 
-                if os.path.isfile(url_or_filename):
-                    src, dst = url_or_filename, storage_path
-                    if not os.path.exists(dst):
-                        shutil.copyfile(src=src, dst=dst)
-                    else:
-                        logging.info("Using existing file {}.".format(dst))
-                else:
-                    if os.path.isdir(storage_path):
-                        # if only dirname is provided, suffix with basename of URL.
-                        raise ValueError(
-                            "Expecting storage_path to be a file path, got directory {}".format(
-                                storage_path
-                            )
-                        )
-                    else:
-                        filename = os.path.basename(storage_path)
+        #         if os.path.isfile(url_or_filename):
+        #             src, dst = url_or_filename, storage_path
+        #             if not os.path.exists(dst):
+        #                 shutil.copyfile(src=src, dst=dst)
+        #             else:
+        #                 logging.info("Using existing file {}.".format(dst))
+        #         else:
+        #             if os.path.isdir(storage_path):
+        #                 # if only dirname is provided, suffix with basename of URL.
+        #                 raise ValueError(
+        #                     "Expecting storage_path to be a file path, got directory {}".format(
+        #                         storage_path
+        #                     )
+        #                 )
+        #             else:
+        #                 filename = os.path.basename(storage_path)
                     
-                    if url_or_filename == 'hugging_face':
-                        hf_hub_download(repo_id="alexzyqi/GPT4Point", filename=filename, repo_type="dataset", local_dir=dirname)
-                    else: 
-                        download_url(url=url_or_filename, root=dirname, filename=filename)
+        #             if url_or_filename == 'hugging_face':
+        #                 hf_hub_download(repo_id="alexzyqi/GPT4Point", filename=filename, repo_type="dataset", local_dir=dirname)
+        #             else: 
+        #                 download_url(url=url_or_filename, root=dirname, filename=filename)
 
     def _download_pts(self):
         if isinstance(self.data_type, omegaconf.listconfig.ListConfig):

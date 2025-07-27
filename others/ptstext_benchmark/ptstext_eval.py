@@ -24,9 +24,35 @@ class Ptstext_EvalCap:
         # imgIds = self.coco.getImgIds()
         gts = {}
         res = {}
+
+        valid_pcd_ids = []
         for pcdId in pcdIds:
-            gts[pcdId] = self.ptstext_prediction.pcdToAnns[pcdId]
-            res[pcdId] = self.ptstext_gt.pcdToAnns[pcdId]
+            # Ground Truth と 予測結果の両方が存在するかチェック
+            if (pcdId in self.ptstext_gt.pcdToAnns and 
+                pcdId in self.ptstext_prediction.pcdToAnns and
+                len(self.ptstext_gt.pcdToAnns[pcdId]) > 0 and
+                len(self.ptstext_prediction.pcdToAnns[pcdId]) > 0):
+                
+                gts[pcdId] = self.ptstext_gt.pcdToAnns[pcdId]         # Ground Truth
+                res[pcdId] = self.ptstext_prediction.pcdToAnns[pcdId] # 予測結果
+                valid_pcd_ids.append(pcdId)
+            else:
+                print(f"Warning: Missing data for pcd_id {pcdId}")
+        
+        if len(valid_pcd_ids) == 0:
+            print("Error: No valid pcd_ids found for evaluation")
+            # デフォルト値を設定
+            self.eval = {
+                "Bleu_1": 0.0,
+                "Bleu_2": 0.0,
+                "Bleu_3": 0.0,
+                "Bleu_4": 0.0,
+                "ROUGE_L": 0.0,
+                "CIDEr": 0.0
+            }
+            return
+        
+        print(f"Evaluating {len(valid_pcd_ids)} valid samples")
 
         # =================================================
         # Set up scorers
@@ -42,9 +68,9 @@ class Ptstext_EvalCap:
         print('setting up scorers...')
         scorers = [
             (Bleu(4), ["Bleu_1", "Bleu_2", "Bleu_3", "Bleu_4"]),
-            (Meteor(),"METEOR"),
+            # (Meteor(),"METEOR"),
             (Rouge(), "ROUGE_L"),
-            (Cider(), "CIDEr"),
+            # (Cider(), "CIDEr"),
             # (Spice(), "SPICE")
         ]
 

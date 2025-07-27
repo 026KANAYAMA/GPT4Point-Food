@@ -70,6 +70,9 @@ def main():
 
     cfg = Config(parse_args())
 
+    # import pdb
+    # pdb.set_trace()
+
     init_distributed_mode(cfg.run_cfg)
 
     setup_seeds(cfg)
@@ -91,3 +94,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# python -m torch.distributed.run --master_port=32239 --nproc_per_node=1 evaluate.py --cfg-path lavis/projects/gpt4point/eval/captioning3d_cap3d_opt2.7b_eval.yaml

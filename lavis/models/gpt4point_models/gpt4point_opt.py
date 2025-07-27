@@ -224,11 +224,27 @@ class GPT4Point_OPT(GPT4Point_Base):
                 truncation=True,
                 max_length=self.max_txt_len,
             ).to(point.device)
+
+            # デバッグ情報を追加
+            print(f"opt_tokens.input_ids.shape: {opt_tokens.input_ids.shape}")
+            print(f"prompt: {prompt}")
+            print(f"max_length: {max_length}")
+            print(f"min_length: {min_length}")
+
             attention_mask = torch.cat([atts_opt, opt_tokens.attention_mask], dim=1)
             
             # new version for transformers>=4.27
             inputs_embeds = self.opt_model.get_input_embeddings()(opt_tokens.input_ids)
             inputs_embeds = torch.cat([inputs_opt,inputs_embeds],dim=1)
+
+            # 生成パラメータの検証と修正
+            total_input_length = inputs_embeds.shape[1]
+            effective_max_length = max(total_input_length + 1, max_length)
+            effective_min_length = max(total_input_length + 1, min_length)
+            
+            print(f"total_input_length: {total_input_length}")
+            print(f"effective_max_length: {effective_max_length}")
+            print(f"effective_min_length: {effective_min_length}")
             
             outputs = self.opt_model.generate(
                 inputs_embeds=inputs_embeds, 
@@ -237,12 +253,13 @@ class GPT4Point_OPT(GPT4Point_Base):
                 top_p=top_p,
                 temperature=temperature,
                 num_beams=num_beams,
-                max_length=max_length,
-                min_length=min_length,
+                max_length=effective_max_length,
+                # min_length=effective_min_length,
                 eos_token_id=self.eos_token_id,
                 repetition_penalty=repetition_penalty,
                 length_penalty=length_penalty,
                 num_return_sequences=num_captions,
+                pad_token_id=self.opt_tokenizer.pad_token_id,
             )
             output_text = self.opt_tokenizer.batch_decode(
                 outputs, skip_special_tokens=True
@@ -312,6 +329,12 @@ class GPT4Point_OPT(GPT4Point_Base):
             apply_lemmatizer=apply_lemmatizer,
             ckpt_special_strs=ckpt_special_strs
         )
+        # import pdb
+        # pdb.set_trace()
+        # PointEncoderを個別にロード
+        point_encoder_ckpt = torch.load('/home/yanai-lab/kanayama-r/Projects/LLM/GPT4Point-Food/weights/point_encoder_pointbert_wcolor.pth', map_location='cpu')
+        model.point_encoder.load_state_dict(point_encoder_ckpt)
+
         model.load_checkpoint_from_config(cfg)
 
         return model

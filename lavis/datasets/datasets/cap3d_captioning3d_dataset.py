@@ -101,6 +101,8 @@ class Cap3d_Captioning3d_EvalDataset(BaseDataset):
         ann_root (string): directory to store the annotation file
         split (string): val or test
         """
+        # import pdb
+        # pdb.set_trace()
         super().__init__(text_processor=text_processor, pts_processor=pts_processor, pts_root=pts_root, ann_paths=ann_paths)
 
         if hasattr(args, 'petrel_client'):
@@ -158,8 +160,10 @@ class Cap3d_Captioning3d_EvalDataset(BaseDataset):
 
 
 def cap3d_captioning3d_eval(results_file, split):
+    # import pdb
+    # pdb.set_trace()
     filepaths = {
-        "test": "data/cap3d/annotations/cap3d_real_and_chatgpt_caption_test_gt.json",
+        "test": "/home/yanai-lab/kanayama-r/Projects/LLM/GPT4Point-Food/data/cap3d/annotations/val_and_test/cap3d_caption_test.json",
     }
     if not os.path.exists(filepaths[split]):
         gt_directory, gt_filename = os.path.split(filepaths[split])

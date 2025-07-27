@@ -62,7 +62,7 @@ class GPT4Point_Base(BaseModel):
 
     @classmethod
     def init_point_encoder(
-        self, model_name, point_encoder_cfg,
+        cls, model_name, point_encoder_cfg,
     ):
         assert model_name in ["ulip_point_bert",], "point-encoder model must be ulip_point_bert"
         return PointTransformer_color(point_encoder_cfg) 
@@ -76,16 +76,18 @@ class GPT4Point_Base(BaseModel):
                 url_or_filename, check_hash=False, progress=True
             )
             checkpoint = torch.load(cached_file, map_location="cpu")
-        elif os.path.isfile(url_or_filename):
+        elif os.path.isfile(url_or_filename): #ここ
             checkpoint = torch.load(url_or_filename, map_location="cpu")
         else:
             raise RuntimeError("checkpoint url or path is invalid")
+
         # here we should modified.
         state_dict = checkpoint["model"]
         if 'vision_proj.weight' in state_dict: # this is for stage1.
             state_dict['point_proj.weight'] = state_dict.pop('vision_proj.weight')
             state_dict['point_proj.bias'] = state_dict.pop('vision_proj.bias')
-        filtered_state_dict = self.check_model_checkpoint_consistency(state_dict, special_strs=self.ckpt_special_strs)
+        # filtered_state_dict = self.check_model_checkpoint_consistency(state_dict, special_strs=self.ckpt_special_strs)
+        filtered_state_dict = state_dict
         msg = self.load_state_dict(filtered_state_dict, strict=False)
 
         # logging.info("Missing keys {}".format(msg.missing_keys))
